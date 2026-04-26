@@ -1,1 +1,1040 @@
 
+<!DOCTYPE html>
+<html lang="nl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Perzisch Oefenen</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root{--bg:#f5f0ff;--card:#ffffff;--card2:#ede8fb;--accent:#7c3aed;--accent2:#9333ea;--gold:#d97706;--green:#16a34a;--red:#dc2626;--text:#1e1033;--muted:#6b5c8a;--border:#d4c8f0;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'Nunito',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column;align-items:center;padding:20px 16px 40px;background-image:radial-gradient(ellipse at 20% 10%,#ede8fb 0%,transparent 60%),radial-gradient(ellipse at 80% 80%,#f5f0ff 0%,transparent 60%);}
+  h1{font-size:1.6rem;font-weight:800;color:var(--accent2);margin-bottom:4px;}
+  .subtitle{color:var(--muted);font-size:0.85rem;margin-bottom:16px;}
+
+  /* ===== LIJSTEN SCHERM ===== */
+  #listsScreen{width:100%;max-width:420px;}
+  .lists-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;}
+  .lists-header h2{font-size:1rem;font-weight:800;color:var(--text);}
+  .btn-new-list{padding:8px 14px;border-radius:10px;border:none;background:var(--accent);color:#1a0030;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.82rem;cursor:pointer;}
+  .list-card{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:border-color 0.2s,box-shadow 0.2s;position:relative;}
+  .list-card:hover{border-color:var(--accent);box-shadow:0 0 16px #c084fc22;}
+  .list-card.active-list{border-color:var(--accent);box-shadow:0 0 16px #c084fc33;}
+  .list-card-name{font-size:1rem;font-weight:800;margin-bottom:4px;}
+  .list-card-meta{font-size:0.75rem;color:var(--muted);}
+  .list-card-actions{position:absolute;top:12px;right:12px;display:flex;gap:6px;}
+  .list-act-btn{background:none;border:none;cursor:pointer;font-size:1rem;padding:2px 4px;opacity:0.6;}
+  .list-act-btn:hover{opacity:1;}
+  .list-all-card{background:linear-gradient(135deg,#7c3aed,#6d28d9);border:1px solid #6d28d9;border-radius:14px;padding:14px 16px;margin-bottom:10px;cursor:pointer;transition:box-shadow 0.2s;}
+  .list-all-card:hover{box-shadow:0 0 20px #c084fc44;}
+  .list-all-name{font-size:1rem;font-weight:800;color:#ffffff;margin-bottom:4px;}
+  .new-list-form{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:14px;margin-bottom:10px;display:none;}
+  .new-list-form input{width:100%;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;font-size:0.95rem;outline:none;margin-bottom:8px;}
+  .new-list-form input:focus{border-color:var(--accent);}
+  .new-list-form-btns{display:flex;gap:8px;}
+
+  /* ===== QUIZ SCHERM ===== */
+  #quizScreen{width:100%;max-width:420px;display:none;}
+  .back-btn{display:flex;align-items:center;gap:6px;background:none;border:none;color:var(--muted);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer;margin-bottom:12px;padding:4px 0;}
+  .back-btn:hover{color:var(--text);}
+  .active-list-label{font-size:0.75rem;color:var(--accent);font-weight:700;text-align:center;margin-bottom:8px;}
+  .mode-selector{display:flex;gap:8px;margin-bottom:16px;background:var(--card);border-radius:12px;padding:4px;border:1px solid var(--border);}
+  .mode-btn{padding:8px 14px;border-radius:9px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.78rem;background:transparent;color:var(--muted);transition:all 0.2s;}
+  .mode-btn.active{background:var(--accent);color:#1a0030;}
+  .stats{display:flex;gap:8px;margin-bottom:16px;width:100%;}
+  .stat{flex:1;background:var(--card);border:1px solid var(--border);border-radius:10px;padding:8px 6px;text-align:center;}
+  .stat-num{font-size:1.2rem;font-weight:800;}
+  .stat-label{font-size:0.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:0.5px;}
+  .stat.good .stat-num{color:var(--green);} .stat.bad .stat-num{color:var(--red);} .stat.due .stat-num{color:var(--gold);} .stat.later .stat-num{color:var(--accent);}
+  .progress-wrap{width:100%;background:var(--card);border-radius:99px;height:6px;margin-bottom:20px;overflow:hidden;border:1px solid var(--border);}
+  .progress-fill{height:100%;background:linear-gradient(90deg,var(--accent),var(--accent2));border-radius:99px;transition:width 0.4s ease;}
+  .card{width:100%;background:var(--card);border:1px solid var(--border);border-radius:20px;padding:32px 24px 24px;text-align:center;margin-bottom:16px;min-height:180px;display:flex;flex-direction:column;align-items:center;justify-content:center;position:relative;box-shadow:0 2px 16px #7c3aed18;transition:border-color 0.2s,box-shadow 0.2s;}
+  .card.shake{animation:shake 0.35s ease;} .card.correct{border-color:var(--green);box-shadow:0 0 24px #16a34a22;} .card.wrong{border-color:var(--red);box-shadow:0 0 24px #dc262622;}
+  @keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+  .direction-tag{position:absolute;top:12px;right:14px;font-size:0.65rem;font-weight:700;text-transform:uppercase;color:var(--muted);background:var(--card2);padding:3px 8px;border-radius:6px;}
+  .srs-tag{position:absolute;top:12px;left:14px;font-size:0.65rem;font-weight:700;color:var(--gold);background:#fbbf2422;padding:3px 8px;border-radius:6px;border:1px solid #fbbf2444;}
+  .question-word{font-size:2.2rem;font-weight:800;color:var(--text);line-height:1.2;margin-bottom:6px;}
+  .question-word.persian{font-family:'Amiri',serif;font-size:2.8rem;direction:rtl;}
+  .transliteration{font-size:0.9rem;color:var(--accent);font-style:italic;margin-top:6px;font-weight:600;}
+  .input-wrap{width:100%;margin-bottom:12px;}
+  input[type="text"]{width:100%;padding:14px 18px;border-radius:12px;border:2px solid var(--border);background:var(--card);color:var(--text);font-family:'Nunito',sans-serif;font-size:1rem;font-weight:600;outline:none;transition:border-color 0.2s;text-align:center;}
+  input[type="text"]:focus{border-color:var(--accent);}
+  input[type="text"].correct{border-color:var(--green);background:var(--green);color:#072010;font-weight:800;}
+  input[type="text"].wrong{border-color:var(--red);background:var(--red);color:#200707;font-weight:800;}
+  .btn-row{display:flex;gap:10px;width:100%;margin-bottom:12px;}
+  .btn{flex:1;padding:13px;border-radius:12px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.95rem;transition:all 0.15s;}
+  .btn-primary{background:var(--accent);color:#1a0030;} .btn-primary:hover{filter:brightness(1.1);}
+  .btn-secondary{background:var(--card2);color:var(--muted);border:1px solid var(--border);}
+  .feedback{width:100%;padding:12px 16px;border-radius:12px;font-size:0.9rem;font-weight:800;text-align:center;margin-bottom:12px;display:none;}
+  .feedback.correct{background:var(--green);color:#072010;display:block;} .feedback.wrong{background:var(--red);color:#200707;display:block;}
+  .srs-btns{display:none;gap:8px;width:100%;margin-bottom:12px;}
+  .srs-btns.visible{display:flex;}
+  .srs-btn{flex:1;padding:10px 4px;border-radius:10px;border:none;cursor:pointer;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.72rem;display:flex;flex-direction:column;align-items:center;gap:2px;}
+  .srs-btn .interval{font-size:0.62rem;opacity:0.85;}
+  .srs-btn.again{background:#fee2e2;color:#991b1b;border:1px solid #fca5a5;} .srs-btn.hard{background:#fef3c7;color:#92400e;border:1px solid #fcd34d;} .srs-btn.good{background:#dcfce7;color:#15803d;border:1px solid #86efac;} .srs-btn.easy{background:#dbeafe;color:#1d4ed8;border:1px solid #93c5fd;}
+  .done-screen{display:none;width:100%;text-align:center;padding:32px 0;}
+  .done-emoji{font-size:3rem;margin-bottom:12px;} .done-title{font-size:1.4rem;font-weight:800;color:var(--accent2);margin-bottom:8px;} .done-sub{color:var(--muted);font-size:0.9rem;margin-bottom:8px;} .done-next{color:var(--accent);font-size:0.85rem;margin-bottom:24px;}
+  .toggle-list-btn{background:var(--card2);border:1px solid var(--border);color:var(--text);border-radius:8px;padding:8px 16px;font-family:'Nunito',sans-serif;font-size:0.85rem;font-weight:700;cursor:pointer;margin-bottom:12px;width:100%;}
+  .word-list{width:100%;margin-bottom:16px;}
+  .word-item{display:flex;align-items:center;gap:6px;padding:8px 10px;border-radius:10px;margin-bottom:5px;font-size:0.78rem;background:var(--card);border:1px solid var(--border);}
+  .word-item .fa-w{font-family:'Amiri',serif;font-size:1rem;direction:rtl;min-width:70px;text-align:right;} .word-item .nl-w{color:var(--muted);flex:1;} .word-item .srs-info{font-size:0.68rem;font-weight:700;white-space:nowrap;}
+  .srs-new{color:var(--accent);} .srs-learning{color:var(--gold);} .srs-review{color:var(--green);}
+
+  /* ===== WOORDEN TOEVOEGEN SCHERM ===== */
+  #addScreen{width:100%;max-width:420px;display:none;}
+  .add-section{width:100%;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:16px;margin-top:8px;}
+  .add-section h3{font-size:0.85rem;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:10px;}
+  .list-select-row{margin-bottom:12px;}
+  .list-select-row label{font-size:0.78rem;color:var(--muted);display:block;margin-bottom:4px;}
+  .list-select-row select{width:100%;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;font-size:0.9rem;outline:none;}
+  .add-tabs{display:flex;gap:6px;margin-bottom:12px;}
+  .add-tab{flex:1;padding:8px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--muted);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer;transition:all 0.2s;}
+  .add-tab.active{background:var(--accent);color:#1a0030;border-color:var(--accent);}
+  .add-row{display:flex;gap:8px;margin-bottom:8px;}
+  .add-row input{flex:1;padding:10px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;font-size:0.9rem;outline:none;}
+  .add-row input:focus{border-color:var(--accent);}
+  .btn-add{padding:10px 14px;border-radius:10px;border:none;background:var(--accent);color:#1a0030;font-family:'Nunito',sans-serif;font-weight:700;cursor:pointer;font-size:0.88rem;white-space:nowrap;}
+  .photo-zone{border:2px dashed var(--border);border-radius:12px;padding:20px 16px;text-align:center;cursor:pointer;position:relative;margin-bottom:10px;transition:border-color 0.2s;}
+  .photo-zone:hover{border-color:var(--accent);}
+  .photo-zone input[type="file"]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+  .photo-zone-text{color:var(--muted);font-size:0.85rem;line-height:1.6;}
+  .photo-preview{width:100%;border-radius:10px;margin-bottom:10px;max-height:180px;object-fit:contain;display:none;}
+  .ai-status{font-size:0.82rem;text-align:center;margin-bottom:8px;min-height:18px;color:var(--muted);}
+  .ai-status.loading{color:var(--accent);} .ai-status.success{color:var(--green);} .ai-status.error{color:var(--red);}
+  .preview-table{width:100%;border-collapse:collapse;margin-bottom:8px;font-size:0.8rem;}
+  .preview-table th{color:var(--muted);font-size:0.68rem;text-transform:uppercase;letter-spacing:0.5px;padding:3px 5px;text-align:left;}
+  .preview-table td{padding:5px 5px;border-top:1px solid var(--border);}
+  .preview-table input{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:6px;padding:4px 6px;color:var(--text);font-family:'Nunito',sans-serif;font-size:0.8rem;outline:none;}
+  .preview-table input.fa-inp{font-family:'Amiri',serif;font-size:0.95rem;direction:rtl;text-align:right;}
+  .del-btn{background:none;border:none;color:var(--red);cursor:pointer;font-size:1rem;}
+  .reset-btn{background:none;border:1px solid var(--border);color:var(--muted);border-radius:8px;padding:6px 12px;font-family:'Nunito',sans-serif;font-size:0.75rem;cursor:pointer;margin-top:8px;}
+  #apiKeyInput:focus{border-color:var(--accent);}
+  .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:#7c3aed;border:1px solid #6d28d9;color:#ffffff;padding:10px 20px;border-radius:12px;font-size:0.85rem;font-weight:700;z-index:999;opacity:0;transition:opacity 0.3s;pointer-events:none;white-space:pre-line;text-align:center;}
+  .toast.show{opacity:1;}
+
+  /* NAV */
+  .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#ffffff;border-top:2px solid var(--border);display:flex;justify-content:center;gap:0;z-index:10;box-shadow:0 -2px 12px #7c3aed18;}
+  .nav-btn{flex:1;max-width:140px;padding:12px 8px 10px;border:none;background:transparent;color:var(--muted);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.72rem;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;transition:color 0.2s;}
+  .nav-btn .nav-icon{font-size:1.3rem;}
+  .nav-btn.active{color:var(--accent);}
+  body{padding-bottom:80px;}
+</style>
+</head>
+<body>
+
+<h1>🌸 Perzisch Oefenen</h1>
+<p class="subtitle">Spaced repetition — woorden op het juiste moment</p>
+<div class="toast" id="toast"></div>
+
+<div id="apiKeyBanner" style="display:none;width:100%;max-width:420px;background:#ede8fb;border:1px solid #7c3aed;border-radius:14px;padding:14px 16px;margin-bottom:16px">
+  <div style="font-size:0.82rem;font-weight:700;color:#6d28d9;margin-bottom:4px">🔑 API-sleutel vereist</div>
+  <div style="font-size:0.75rem;color:var(--muted);margin-bottom:10px">Haal gratis op via <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">console.anthropic.com</a> → API Keys</div>
+  <div style="display:flex;gap:8px;margin-bottom:6px">
+    <input type="password" id="apiKeyInput" placeholder="sk-ant-api03-..." style="flex:1;padding:9px 12px;border-radius:10px;border:1px solid var(--border);background:var(--bg);color:var(--text);font-family:'Nunito',sans-serif;font-size:0.85rem;outline:none"/>
+    <button onclick="saveApiKey()" style="padding:9px 14px;border-radius:10px;border:none;background:var(--accent);color:#1a0030;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.85rem;cursor:pointer">Opslaan</button>
+  </div>
+  <div style="font-size:0.7rem;color:#6b5c8a">Wordt lokaal opgeslagen op jouw apparaat, nergens naartoe gestuurd.</div>
+</div>
+
+
+<!-- ===== LIJSTEN SCHERM ===== -->
+<div id="listsScreen">
+  <div class="lists-header">
+    <h2>📚 Mijn woordenlijsten</h2>
+    <button class="btn-new-list" onclick="showNewListForm()">+ Nieuwe lijst</button>
+  </div>
+  <div class="new-list-form" id="newListForm">
+    <input type="text" id="newListName" placeholder="Naam van de lijst (bijv. Les 1)" />
+    <div class="new-list-form-btns">
+      <button class="btn btn-secondary" style="flex:1;padding:9px" onclick="hideNewListForm()">Annuleer</button>
+      <button class="btn btn-primary" style="flex:1;padding:9px" onclick="createList()">Aanmaken</button>
+    </div>
+  </div>
+  <div id="listCards"></div>
+</div>
+
+<!-- ===== QUIZ SCHERM ===== -->
+<div id="quizScreen">
+  <button class="back-btn" onclick="showScreen('lists')">← Terug naar lijsten</button>
+  <div class="active-list-label" id="activeListLabel"></div>
+  <div class="mode-selector">
+    <button class="mode-btn active" onclick="setMode('both',this)">Beide richtingen</button>
+    <button class="mode-btn" onclick="setMode('nl2fa',this)">NL → فارسی</button>
+    <button class="mode-btn" onclick="setMode('fa2nl',this)">فارسی → NL</button>
+  </div>
+  <div class="stats">
+    <div class="stat good"><div class="stat-num" id="statGood">0</div><div class="stat-label">✓ Goed</div></div>
+    <div class="stat bad"><div class="stat-num" id="statBad">0</div><div class="stat-label">✗ Fout</div></div>
+    <div class="stat due"><div class="stat-num" id="statDue">0</div><div class="stat-label">📅 Te doen</div></div>
+    <div class="stat later"><div class="stat-num" id="statLater">0</div><div class="stat-label">💤 Later</div></div>
+  </div>
+  <div class="progress-wrap"><div class="progress-fill" id="progressFill" style="width:0%"></div></div>
+
+  <div id="quizSection">
+    <div class="card" id="flashcard">
+      <div class="srs-tag" id="srsTag" style="display:none"></div>
+      <div class="direction-tag" id="dirTag"></div>
+      <div class="question-word" id="questionWord">Laden...</div>
+      <div class="transliteration" id="translit"></div>
+    </div>
+    <div class="input-wrap">
+      <input type="text" id="answerInput" placeholder="Jouw antwoord..." onkeydown="handleKey(event)" autocomplete="off" autocorrect="off" spellcheck="false" />
+    </div>
+    <div class="feedback" id="feedbackBox"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="skipWord()">Weet niet</button>
+      <button class="btn btn-primary" id="mainBtn" onclick="handleMainBtn()">Controleer</button>
+    </div>
+    <div class="srs-btns" id="srsBtns">
+      <button class="srs-btn again" onclick="rateSRS(0)">😓 Opnieuw<span class="interval" id="int0"></span></button>
+      <button class="srs-btn hard" onclick="rateSRS(2)">😕 Moeilijk<span class="interval" id="int2"></span></button>
+      <button class="srs-btn good" onclick="rateSRS(3)">🙂 Goed<span class="interval" id="int3"></span></button>
+      <button class="srs-btn easy" onclick="rateSRS(5)">😄 Makkelijk<span class="interval" id="int5"></span></button>
+    </div>
+  </div>
+
+  <div class="done-screen" id="doneScreen">
+    <div class="done-emoji">🎉</div>
+    <div class="done-title">Sessie klaar!</div>
+    <div class="done-sub" id="doneSub"></div>
+    <div class="done-next" id="doneNext"></div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="showScreen('lists')">← Lijsten</button>
+      <button class="btn btn-primary" onclick="startSession()">Opnieuw</button>
+    </div>
+  </div>
+
+  <button class="toggle-list-btn" onclick="toggleWordList()">📖 Woordenlijst tonen/verbergen</button>
+  <div class="word-list" id="wordListDisplay" style="display:none"></div>
+</div>
+
+<!-- ===== WOORDEN TOEVOEGEN SCHERM ===== -->
+<div id="addScreen">
+  <div class="add-section">
+    <h3>➕ Woorden toevoegen</h3>
+    <div class="list-select-row">
+      <label>Voeg toe aan lijst:</label>
+      <select id="targetListSelect"></select>
+    </div>
+    <div class="add-tabs">
+      <button class="add-tab active" onclick="switchTab('manual',this)">✏️ Handmatig</button>
+      <button class="add-tab" onclick="switchTab('photo',this)">📷 Foto</button>
+      <button class="add-tab" onclick="switchTab('pdf',this)">📄 PDF</button>
+    </div>
+    <div id="tabManual">
+      <div class="add-row">
+        <input type="text" id="newNl" placeholder="Nederlands" />
+        <input type="text" id="newFa" placeholder="فارسی" style="direction:rtl;text-align:right;font-family:'Amiri',serif;font-size:1rem" />
+      </div>
+      <div class="add-row">
+        <input type="text" id="newTranslit" placeholder="Uitspraak (bijv. dûst)" />
+        <button class="btn-add" onclick="addWordManual()">Voeg toe</button>
+      </div>
+    </div>
+    <div id="tabPhoto" style="display:none">
+      <div class="photo-zone">
+        <input type="file" accept="image/*" onchange="handlePhoto(event)" />
+        <div class="photo-zone-text">📷 Tik hier om een foto te maken<br><span style="font-size:0.75rem">of kies een afbeelding uit je bibliotheek</span></div>
+      </div>
+      <img id="photoPreview" class="photo-preview" />
+      <div class="ai-status" id="aiStatus"></div>
+      <div id="previewSection" style="display:none">
+        <table class="preview-table">
+          <thead><tr><th>Nederlands</th><th>فارسی</th><th>Uitspraak</th><th></th></tr></thead>
+          <tbody id="previewBody"></tbody>
+        </table>
+        <button class="btn-add" style="width:100%;padding:11px;border-radius:10px" onclick="addPreviewWords()">✓ Alle woorden toevoegen</button>
+      </div>
+    </div>
+
+
+        <div id="tabPdf" style="display:none">
+      <div class="photo-zone">
+        <input type="file" accept="application/pdf" onchange="handlePdf(event)" />
+        <div class="photo-zone-text">📄 Tik hier om een PDF te kiezen<br><span style="font-size:0.75rem">Elke pagina wordt automatisch verwerkt</span></div>
+      </div>
+      <div class="ai-status" id="pdfStatus"></div>
+      <div id="pdfPreviewSection" style="display:none">
+        <table class="preview-table">
+          <thead><tr><th>Nederlands</th><th>فارسی</th><th>Uitspraak</th><th></th></tr></thead>
+          <tbody id="pdfPreviewBody"></tbody>
+        </table>
+        <button class="btn-add" style="width:100%;padding:11px;border-radius:10px" onclick="addPdfPreviewWords()">✓ Alle woorden toevoegen</button>
+      </div>
+    </div>
+
+    <div style="text-align:center">
+      <button class="reset-btn" onclick="syncLists()">🔄 Synchroniseer nieuwe lijsten</button>
+      <button class="reset-btn" onclick="confirmReset()">🗑️ Voortgang wissen</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <button class="nav-btn active" id="nav-lists" onclick="showScreen('lists')"><span class="nav-icon">📚</span>Lijsten</button>
+  <button class="nav-btn" id="nav-quiz" onclick="showScreen('quiz')"><span class="nav-icon">🎯</span>Oefenen</button>
+  <button class="nav-btn" id="nav-add" onclick="showScreen('add')"><span class="nav-icon">➕</span>Toevoegen</button>
+</div>
+
+<script>
+const STORAGE_KEY = 'perzisch_v3';
+const MS = 86400000;
+
+// ===== DIACRIETEN =====
+function stripDia(s){
+  s=s.normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[âāá]/g,'a').replace(/[ûúū]/g,'u').replace(/[îíī]/g,'i').replace(/[ôóō]/g,'o').replace(/[êéē]/g,'e');
+  s=s.replace(/[\u064B-\u065F]/g,'');
+  return s;
+}
+function normalize(s){ return stripDia(s.trim().toLowerCase()).replace(/[،,\.!؟?()\[\]]/g,'').replace(/\s+/g,' '); }
+
+// ===== DATA STRUCTUUR =====
+// lists: [{id, name, words:[{nl,fa,translit}]}]
+// srsData: { cardId: {interval,ef,reps,due,listId,wordIdx,dir} }
+
+let lists = [];
+let srsData = {};
+let activeListIds = []; // welke lijsten worden geoefend ('all' of [id,...])
+let mode = 'both';
+let sessionQueue = [], currentCard = null, showingAnswer = false;
+let totalGood = 0, totalBad = 0;
+
+const DEFAULT_LIST = {
+  id: 'default',
+  name: 'Les 1 & 2',
+  words: [
+    {nl:"Engels / Ingels",            fa:"اِنگلیسی / اینگلیسی", translit:"engelisi / inghelisi"},
+    {nl:"Makkelijk",                   fa:"آسان / آسون",          translit:"âsân / âsun"},
+    {nl:"Ik vind leuk / ik houd van", fa:"دوست دارَم",            translit:"dûst dâram"},
+    {nl:"Scheikunde",                  fa:"شیمی",                  translit:"shimi"},
+    {nl:"Wat geweldig!",              fa:"چه عالی!",              translit:"che âli!"},
+    {nl:"Klas / Klaslokaal",          fa:"کِلاس",                 translit:"kelâs"},
+    {nl:"Lijdend voorwerp teken",      fa:"را / رو",               translit:"râ / ro"},
+    {nl:"Vriend",                      fa:"دوست",                  translit:"dûst"},
+    {nl:"Wat",                         fa:"چه / چی",               translit:"che / chi"},
+    {nl:"Natuurkunde",                 fa:"فیزیک",                 translit:"fizik"},
+    {nl:"Vier",                        fa:"چَهار",                 translit:"chahâr"},
+    {nl:"Geschiedenis / Datum",        fa:"تاریخ",                 translit:"târikh"},
+    {nl:"Dit",                         fa:"این",                   translit:"in"},
+    {nl:"Perzisch",                    fa:"فارسی",                 translit:"fârsi"},
+    {nl:"Semester / Trimester",        fa:"تِرم",                  translit:"teram"},
+    {nl:"Baby / Kind",                 fa:"بَچه",                  translit:"bache"},
+    {nl:"Broer",                       fa:"بَرادَر",               translit:"barâdar"},
+    {nl:"Heel / Erg",                  fa:"خیلی",                  translit:"kheyli"},
+    {nl:"Jongen / Zoon",               fa:"پِسَر",                 translit:"pesar"},
+    {nl:"Hoeveel",                     fa:"چَند (تا)",              translit:"chand (tâ)"},
+    {nl:"Meisje / Dochter",            fa:"دُختَر",                translit:"dokhtar"},
+    {nl:"Eén",                         fa:"یِک / یه",              translit:"yek / ye"},
+    {nl:"Vrouw / Echtgenote",          fa:"زَن",                   translit:"zan"},
+    {nl:"Ik heb",                      fa:"دارَم",                 translit:"dâram"},
+    {nl:"Zij hebben",                  fa:"دارَند / دارَن",        translit:"dârand / dâran"},
+    {nl:"Jij hebt (enkelvoud)",        fa:"داری",                  translit:"dâri"},
+    {nl:"Zes",                         fa:"شِش / شِیش",            translit:"shesh / shish"},
+    {nl:"Dus / Dan",                   fa:"پَس",                   translit:"pas"},
+    {nl:"Zus",                         fa:"خواهَر",                translit:"khâhar"},
+    {nl:"Twee",                        fa:"دو",                    translit:"do"},
+    {nl:"Drie",                        fa:"سه",                    translit:"se"},
+    {nl:"Ouders (vader & moeder)",     fa:"پِدَر وَ مادَر",        translit:"pedar va mâdar"},
+    {nl:"En",                          fa:"وَ / و (o)",             translit:"va / o"},
+    {nl:"Ik heb niet",                 fa:"نَدارَم",               translit:"nadâram"},
+  ]
+};
+
+const DEFAULT_LIST2 = {
+  id: 'les3',
+  name: 'In de les',
+  words: [
+    {nl:"Les",                    fa:"دَرس",                      translit:"dars"},
+    {nl:"Oefening",               fa:"تَمرین",                    translit:"tamrin"},
+    {nl:"Luisteren / luister naar",fa:"گوش کُنید / گوش کنین",     translit:"gush konid / gush konin"},
+    {nl:"Spreken",                fa:"حَرف بِزَنید / حرف بزنین",  translit:"harf bezanid / harf bezanin"},
+    {nl:"Schrijven",              fa:"بِنویسید / بنویسین",        translit:"benevisid / benevisin"},
+    {nl:"Lezen",                  fa:"بِخوانید / بخونین",         translit:"bekhanid / bekhonin"},
+    {nl:"Herhalen",               fa:"تِکرار کُنید / تکرار کنین", translit:"tekrar konid / tekrar konin"},
+    {nl:"Raden / gokken",         fa:"حَدس بِزَنید / حدس بزنین",  translit:"hads bezanid / hads bezanin"},
+    {nl:"Openen",                 fa:"باز کُنید / باز کنین",      translit:"bâz konid / bâz konin"},
+    {nl:"Sluiten",                fa:"بِبَندید / ببندین",         translit:"bebandid / bebandin"},
+    {nl:"Woord",                  fa:"کَلمه / واژه",              translit:"kalame / vâzhe"},
+    {nl:"Zin",                    fa:"جُمله",                     translit:"jomle"},
+    {nl:"Term / uitdrukking",     fa:"عِبارَت",                   translit:"ebârat"},
+    {nl:"Makkelijk",              fa:"آسان / آسون",               translit:"âsân / âsun"},
+    {nl:"Moeilijk",               fa:"سَخت",                      translit:"sakht"},
+    {nl:"Studierichting / major", fa:"رِشته",                     translit:"reshte"},
+  ]
+};
+
+const DEFAULT_LIST3 = {
+  id: 'les4',
+  name: 'Les 4',
+  words: [
+    {nl:"Boek",                          fa:"کِتاب",                        translit:"ketâb"},
+    {nl:"In / Binnen / Bij (gesproken)", fa:"تو",                              translit:"tu"},
+    {nl:"Lieverd / Schatje (informeel)", fa:"قُربانَت / قُربونت",            translit:"qorbânat / qorbunat"},
+    {nl:"Waarom",                        fa:"چرا",                           translit:"cherâ"},
+    {nl:"Heb je tijd?",                  fa:"وَقت داری؟",                    translit:"vaqt dâri?"},
+    {nl:"Gefeliciteerd / Wat fijn voor jou", fa:"خوش به حالَت / خوش به حالت", translit:"khosh be hâlat"},
+    {nl:"Ik heb nodig",                  fa:"لازِم دارَم",                   translit:"lâzem dâram"},
+    {nl:"Bibliotheek",                   fa:"کِتابخانه / کِتابخونه",         translit:"ketâbkhâne / ketâbkhune"},
+    {nl:"Lief / Beste",                  fa:"جان / جون",                     translit:"jân / jun"},
+    {nl:"Echtgenoot / Echtgenote",       fa:"هَمسَر",                        translit:"hamsar"},
+    {nl:"Familie",                       fa:"خانِواده",                      translit:"khânevâde"},
+    {nl:"Naam",                          fa:"نام",                           translit:"nâm"},
+    {nl:"Achternaam / Familienaam",      fa:"نامِ خانِوادَگی",               translit:"nâm-e khânevâdegi"},
+  ]
+};
+
+
+// ===== OPSLAG =====
+function saveData(){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({lists, srsData})); }
+  catch(e){ console.warn('Opslag mislukt',e); }
+}
+function loadData(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(!raw){ lists=[{...DEFAULT_LIST}]; return; }
+    const d = JSON.parse(raw);
+    lists = d.lists && d.lists.length ? d.lists : [{...DEFAULT_LIST},{...DEFAULT_LIST2},{...DEFAULT_LIST3}];
+    srsData = d.srsData || {};
+  } catch(e){ lists=[{...DEFAULT_LIST},{...DEFAULT_LIST2},{...DEFAULT_LIST3}]; }
+}
+
+// ===== SRS =====
+function cardId(listId, wordIdx, dir){ return `${listId}__${wordIdx}__${dir}`; }
+function getCard(listId, wordIdx, dir){
+  const id = cardId(listId, wordIdx, dir);
+  if(!srsData[id]) srsData[id]={ interval:0, ef:2.5, reps:0, due:Date.now(), listId, wordIdx, dir };
+  return srsData[id];
+}
+function isDue(card){ return Date.now() >= card.due; }
+
+function applySM2(card, q){
+  if(q<3){ card.reps=0; card.interval=q===0?0:1; }
+  else{
+    if(card.reps===0) card.interval=q===5?4:1;
+    else if(card.reps===1) card.interval=q===5?10:6;
+    else card.interval=Math.round(card.interval*card.ef);
+    card.reps++;
+  }
+  card.ef=Math.max(1.3,card.ef+0.1-(5-q)*(0.08+(5-q)*0.02));
+  card.due=Date.now()+(q===0?0.007:card.interval)*MS;
+  saveData();
+}
+
+function intervalLabel(card, q){
+  let iv;
+  if(q===0) iv=0.007;
+  else if(q===2) iv=1;
+  else{
+    const r=card.reps;
+    if(r===0) iv=q===5?4:1;
+    else if(r===1) iv=q===5?10:6;
+    else{ const ef=Math.max(1.3,card.ef+0.1-(5-q)*(0.08+(5-q)*0.02)); iv=Math.round(card.interval*ef); }
+  }
+  if(iv<0.1) return '10 min';
+  if(iv<1) return Math.round(iv*24)+'u';
+  return iv===1?'1 dag':iv+' dagen';
+}
+
+// ===== ACTIEVE WOORDEN =====
+function getActiveWords(){
+  const all = activeListIds.includes('all');
+  let result=[];
+  lists.forEach(lst=>{
+    if(all || activeListIds.includes(lst.id)){
+      lst.words.forEach((w,i)=>result.push({...w, listId:lst.id, wordIdx:i}));
+    }
+  });
+  return result;
+}
+
+// ===== SESSIE =====
+function buildSession(){
+  const dirs = mode==='both'?['fa2nl','nl2fa']:[mode];
+  let due=[];
+  getActiveWords().forEach(w=>{
+    dirs.forEach(dir=>{
+      const card=getCard(w.listId,w.wordIdx,dir);
+      if(isDue(card)) due.push(card);
+    });
+  });
+  due.sort((a,b)=>{
+    const an=a.reps===0,bn=b.reps===0;
+    if(an&&!bn) return -1; if(!an&&bn) return 1;
+    return a.due-b.due;
+  });
+  sessionQueue=spreadSameWords(due);
+}
+
+function spreadSameWords(queue){
+  const result=[];
+  const pending=[...queue];
+  while(pending.length>0){
+    const lastKey=result.length>0?`${result[result.length-1].listId}__${result[result.length-1].wordIdx}`:null;
+    let idx=pending.findIndex(c=>`${c.listId}__${c.wordIdx}`!==lastKey);
+    if(idx===-1) idx=0;
+    result.push(pending.splice(idx,1)[0]);
+  }
+  return result;
+}
+
+function countDue(){
+  const dirs=mode==='both'?['fa2nl','nl2fa']:[mode];
+  let n=0;
+  getActiveWords().forEach(w=>dirs.forEach(dir=>{ if(isDue(getCard(w.listId,w.wordIdx,dir))) n++; }));
+  return n;
+}
+function countLater(){
+  const dirs=mode==='both'?['fa2nl','nl2fa']:[mode];
+  let n=0;
+  getActiveWords().forEach(w=>dirs.forEach(dir=>{ if(!isDue(getCard(w.listId,w.wordIdx,dir))) n++; }));
+  return n;
+}
+function nextDueTime(){
+  const dirs=mode==='both'?['fa2nl','nl2fa']:[mode];
+  let earliest=Infinity;
+  getActiveWords().forEach(w=>dirs.forEach(dir=>{
+    const c=getCard(w.listId,w.wordIdx,dir);
+    if(!isDue(c)) earliest=Math.min(earliest,c.due);
+  }));
+  return earliest===Infinity?null:earliest;
+}
+
+// ===== NAVIGATIE =====
+function showScreen(name){
+  document.getElementById('listsScreen').style.display='none';
+  document.getElementById('quizScreen').style.display='none';
+  document.getElementById('addScreen').style.display='none';
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+
+  if(name==='lists'){ document.getElementById('listsScreen').style.display='block'; document.getElementById('nav-lists').classList.add('active'); renderListCards(); }
+  else if(name==='quiz'){ document.getElementById('quizScreen').style.display='block'; document.getElementById('nav-quiz').classList.add('active'); }
+  else if(name==='add'){ document.getElementById('addScreen').style.display='block'; document.getElementById('nav-add').classList.add('active'); renderTargetSelect(); }
+}
+
+// ===== LIJSTEN =====
+function renderListCards(){
+  const el=document.getElementById('listCards');
+  // "Alle lijsten" kaart
+  let html=`<div class="list-all-card" onclick="startWithLists(['all'])" style="color:#fff">
+    <div class="list-all-name">⭐ Alle lijsten oefenen</div>
+    <div class="list-card-meta">${lists.reduce((s,l)=>s+l.words.length,0)} woorden totaal</div>
+  </div>`;
+  lists.forEach(lst=>{
+    const due=countDueForList(lst.id);
+    html+=`<div class="list-card" onclick="startWithLists(['${lst.id}'])">
+      <div class="list-card-actions">
+        <button class="list-act-btn" title="Hernoem" onclick="event.stopPropagation();renameList('${lst.id}')">✏️</button>
+        ${lst.id!=='default'?`<button class="list-act-btn" title="Verwijder" onclick="event.stopPropagation();deleteList('${lst.id}')">🗑️</button>`:''}
+      </div>
+      <div class="list-card-name">${esc(lst.name)}</div>
+      <div class="list-card-meta">${lst.words.length} woorden · ${due} te doen vandaag</div>
+    </div>`;
+  });
+  el.innerHTML=html;
+}
+
+function countDueForList(listId){
+  const lst=lists.find(l=>l.id===listId); if(!lst) return 0;
+  const dirs=mode==='both'?['fa2nl','nl2fa']:[mode];
+  let n=0;
+  lst.words.forEach((_,i)=>dirs.forEach(dir=>{ if(isDue(getCard(listId,i,dir))) n++; }));
+  return n;
+}
+
+function startWithLists(ids){
+  activeListIds=ids;
+  const label=ids.includes('all')?'Alle lijsten':lists.find(l=>l.id===ids[0])?.name||'';
+  document.getElementById('activeListLabel').textContent='📖 '+label;
+  showScreen('quiz');
+  startSession();
+}
+
+function showNewListForm(){ document.getElementById('newListForm').style.display='block'; document.getElementById('newListName').focus(); }
+function hideNewListForm(){ document.getElementById('newListForm').style.display='none'; document.getElementById('newListName').value=''; }
+
+function createList(){
+  const name=document.getElementById('newListName').value.trim();
+  if(!name) return;
+  const id='list_'+Date.now();
+  lists.push({id, name, words:[]});
+  saveData(); hideNewListForm(); renderListCards();
+}
+
+function renameList(id){
+  const lst=lists.find(l=>l.id===id); if(!lst) return;
+  const name=prompt('Nieuwe naam:', lst.name);
+  if(name&&name.trim()){ lst.name=name.trim(); saveData(); renderListCards(); }
+}
+
+function deleteList(id){
+  const lst=lists.find(l=>l.id===id); if(!lst) return;
+  // Toon inline bevestiging in de lijstkaart
+  const cards=document.querySelectorAll('.list-card');
+  cards.forEach(card=>{
+    if(card.innerHTML.includes(`deleteList('${id}')`)){
+      card.style.borderColor='var(--red)';
+      card.style.boxShadow='0 0 16px #f8717144';
+      const existing=card.querySelector('.delete-confirm');
+      if(existing){existing.remove();return;}
+      const div=document.createElement('div');
+      div.className='delete-confirm';
+      div.style.cssText='margin-top:10px;display:flex;gap:8px;';
+      div.innerHTML=`<span style="font-size:0.8rem;color:var(--red);flex:1;align-self:center">Verwijderen?</span>
+        <button onclick="confirmDeleteList('${id}')" style="padding:6px 12px;border-radius:8px;border:none;background:#dc2626;color:#fff;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer">Ja</button>
+        <button onclick="cancelDeleteList('${id}')" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--muted);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer">Nee</button>`;
+      card.appendChild(div);
+    }
+  });
+}
+
+function confirmDeleteList(id){
+  lists=lists.filter(l=>l.id!==id);
+  Object.keys(srsData).forEach(k=>{if(k.startsWith(id+'__')) delete srsData[k];});
+  saveData(); renderListCards();
+}
+
+function cancelDeleteList(id){
+  renderListCards();
+}
+
+// ===== QUIZ =====
+function setMode(m,btn){
+  mode=m;
+  document.querySelectorAll('.mode-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  startSession();
+}
+
+function startSession(){
+  totalGood=0;totalBad=0;
+  buildSession();
+  document.getElementById('doneScreen').style.display='none';
+  document.getElementById('quizSection').style.display='block';
+  updateStats();
+  if(sessionQueue.length===0){showDone();return;}
+  nextCard();
+}
+
+function nextCard(){
+  showingAnswer=false;
+  document.getElementById('mainBtn').textContent='Controleer';
+  document.getElementById('mainBtn').disabled=false;
+  document.getElementById('feedbackBox').className='feedback';
+  document.getElementById('answerInput').className='';
+  document.getElementById('answerInput').value='';
+  document.getElementById('flashcard').className='card';
+  document.getElementById('srsBtns').className='srs-btns';
+  if(sessionQueue.length===0){showDone();return;}
+
+  const card=sessionQueue.shift(); currentCard=card;
+  const lst=lists.find(l=>l.id===card.listId);
+  const w=lst?lst.words[card.wordIdx]:null;
+  if(!w){nextCard();return;}
+
+  const tag=document.getElementById('srsTag');
+  if(card.reps===0){tag.textContent='🆕 Nieuw';tag.style.display='block';}
+  else if(card.interval<=1){tag.textContent='📖 Leren';tag.style.display='block';}
+  else{tag.textContent=`🔁 Herhaling (${card.interval}d)`;tag.style.display='block';}
+
+  document.getElementById('dirTag').textContent=card.dir==='fa2nl'?'فارسی → NL':'NL → فارسی';
+  const qEl=document.getElementById('questionWord');
+  const inp=document.getElementById('answerInput');
+  if(card.dir==='fa2nl'){
+    qEl.textContent=w.fa; qEl.className='question-word persian';
+    document.getElementById('translit').textContent=w.translit?'('+w.translit+')':'';
+    inp.placeholder='Nederlandse vertaling...'; inp.style.direction='ltr'; inp.style.fontFamily="'Nunito',sans-serif";
+  } else {
+    qEl.textContent=w.nl; qEl.className='question-word';
+    document.getElementById('translit').textContent='';
+    inp.placeholder='Perzisch woord...'; inp.style.direction='rtl'; inp.style.fontFamily="'Amiri',serif";
+  }
+  updateStats(); inp.focus();
+}
+
+function handleKey(e){ if(e.key==='Enter') handleMainBtn(); }
+function handleMainBtn(){ if(showingAnswer) return; checkAnswer(); }
+
+function checkAnswer(){
+  const input=document.getElementById('answerInput').value;
+  if(!input.trim()) return;
+  const lst=lists.find(l=>l.id===currentCard.listId);
+  const w=lst?lst.words[currentCard.wordIdx]:null;
+  if(!w) return;
+  const userAns=normalize(input);
+  let correct=false;
+  if(currentCard.dir==='fa2nl'){
+    const opts=w.nl.split('/').map(s=>normalize(s));
+    // Normaliseer ook het antwoord: vervang ' of ' en ' یا ' door '/'
+    const userAnsSplit=userAns.replace(/ of /g,' / ').replace(/ یا /g,' / ').split('/').map(s=>s.trim()).filter(Boolean);
+    correct=opts.some(opt=>userAnsSplit.some(ua=>ua===opt||opt.includes(ua)||ua.includes(opt.split(' ')[0])));
+  } else {
+    const opts=w.fa.split('/').map(s=>s.trim());
+    // Accepteer ook antwoorden waarbij opties gescheiden zijn door ' of ' of ' یا '
+    const userFaSplit=input.replace(/ of /g,' / ').replace(/ یا /g,' / ').split('/').map(s=>normalize(s.trim())).filter(Boolean);
+    correct=opts.some(opt=>userFaSplit.some(ua=>normalize(opt)===ua));
+  }
+  showingAnswer=true;
+  document.getElementById('mainBtn').textContent='...'; document.getElementById('mainBtn').disabled=true;
+  if(correct){
+    totalGood++;
+    document.getElementById('flashcard').className='card correct';
+    document.getElementById('answerInput').className='correct';
+    document.getElementById('feedbackBox').className='feedback correct';
+    document.getElementById('feedbackBox').textContent='✓ Goed! '+(currentCard.dir==='fa2nl'?w.nl:w.fa);
+  } else {
+    totalBad++;
+    document.getElementById('flashcard').className='card wrong';
+    document.getElementById('answerInput').className='wrong';
+    document.getElementById('feedbackBox').className='feedback wrong';
+    document.getElementById('feedbackBox').textContent='✗ Antwoord: '+(currentCard.dir==='fa2nl'?w.nl:w.fa);
+    document.getElementById('flashcard').classList.add('shake');
+    setTimeout(()=>document.getElementById('flashcard').classList.remove('shake'),400);
+  }
+  const card=srsData[cardId(currentCard.listId,currentCard.wordIdx,currentCard.dir)];
+  document.getElementById('int0').textContent=intervalLabel(card,0);
+  document.getElementById('int2').textContent=intervalLabel(card,2);
+  document.getElementById('int3').textContent=intervalLabel(card,3);
+  document.getElementById('int5').textContent=intervalLabel(card,5);
+  document.getElementById('srsBtns').className='srs-btns visible';
+  updateStats();
+}
+
+function rateSRS(q){
+  const card=srsData[cardId(currentCard.listId,currentCard.wordIdx,currentCard.dir)];
+  applySM2(card,q);
+  if(q<3){
+    // Voeg de kaart terug in maar zorg dat hij niet direct na dezelfde kaart in andere richting komt
+    const sameWordIdx = sessionQueue.findIndex(c => c.listId===card.listId && c.wordIdx===card.wordIdx);
+    // Zet hem minimaal 3 posities verder, of na een kaart van een ander woord
+    let insertPos = Math.min(3, sessionQueue.length);
+    for(let i=0; i<Math.min(4,sessionQueue.length); i++){
+      if(sessionQueue[i].wordIdx !== card.wordIdx || sessionQueue[i].listId !== card.listId){
+        insertPos = i+1; break;
+      }
+    }
+    sessionQueue.splice(insertPos, 0, card);
+  }
+  document.getElementById('mainBtn').disabled=false;
+  nextCard();
+}
+
+function skipWord(){
+  if(showingAnswer) return;
+  const lst=lists.find(l=>l.id===currentCard.listId);
+  const w=lst?lst.words[currentCard.wordIdx]:null;
+  totalBad++;
+  document.getElementById('feedbackBox').className='feedback wrong';
+  document.getElementById('feedbackBox').textContent='✗ Antwoord: '+(w?(currentCard.dir==='fa2nl'?w.nl:w.fa):'?');
+  showingAnswer=true; document.getElementById('mainBtn').textContent='...'; document.getElementById('mainBtn').disabled=true;
+  const card=srsData[cardId(currentCard.listId,currentCard.wordIdx,currentCard.dir)];
+  document.getElementById('int0').textContent=intervalLabel(card,0);
+  document.getElementById('int2').textContent=intervalLabel(card,2);
+  document.getElementById('int3').textContent=intervalLabel(card,3);
+  document.getElementById('int5').textContent=intervalLabel(card,5);
+  document.getElementById('srsBtns').className='srs-btns visible';
+  updateStats();
+}
+
+function updateStats(){
+  document.getElementById('statGood').textContent=totalGood;
+  document.getElementById('statBad').textContent=totalBad;
+  document.getElementById('statDue').textContent=sessionQueue.length+(currentCard&&showingAnswer?0:currentCard?1:0);
+  document.getElementById('statLater').textContent=countLater();
+  const total=sessionQueue.length+totalGood+totalBad+(showingAnswer?0:currentCard?1:0);
+  const pct=total>0?Math.round((totalGood+totalBad)/total*100):0;
+  document.getElementById('progressFill').style.width=pct+'%';
+}
+
+function showDone(){
+  document.getElementById('quizSection').style.display='none';
+  document.getElementById('doneScreen').style.display='block';
+  const pct=totalGood+totalBad>0?Math.round(totalGood/(totalGood+totalBad)*100):0;
+  document.getElementById('doneSub').textContent=`${totalGood} goed, ${totalBad} fout — ${pct}% score`;
+  const next=nextDueTime();
+  if(next){
+    const mins=Math.round((next-Date.now())/60000);
+    const label=mins<60?`${mins} minuten`:mins<1440?`${Math.round(mins/60)} uur`:`${Math.round(mins/1440)} dagen`;
+    document.getElementById('doneNext').textContent=`⏰ Volgende kaarten over ${label}`;
+  } else { document.getElementById('doneNext').textContent='✅ Alle woorden bekeken!'; }
+}
+
+function toggleWordList(){
+  const el=document.getElementById('wordListDisplay');
+  el.style.display=el.style.display==='none'?'block':'none';
+  if(el.style.display==='block') renderWordList();
+}
+
+function renderWordList(){
+  const ws=getActiveWords();
+  const dirs=mode==='both'?['fa2nl','nl2fa']:[mode];
+  document.getElementById('wordListDisplay').innerHTML=ws.map(w=>{
+    const cards=dirs.map(dir=>getCard(w.listId,w.wordIdx,dir));
+    const minIv=Math.min(...cards.map(c=>c.interval));
+    const allNew=cards.every(c=>c.reps===0);
+    const allLearning=cards.every(c=>c.reps>0&&c.interval<=6);
+    let sc='srs-new',st='Nieuw';
+    if(!allNew){ if(allLearning){sc='srs-learning';st=`Leren (${minIv}d)`;}else{sc='srs-review';st=`Review (${minIv}d)`;} }
+    return `<div class="word-item"><span class="fa-w">${w.fa}</span><span class="nl-w">${w.nl}</span><span class="srs-info ${sc}">${st}</span></div>`;
+  }).join('');
+}
+
+// ===== WOORDEN TOEVOEGEN =====
+function renderTargetSelect(){
+  const sel=document.getElementById('targetListSelect');
+  sel.innerHTML=lists.map(l=>`<option value="${l.id}">${esc(l.name)}</option>`).join('');
+}
+
+function switchTab(tab,btn){
+  document.querySelectorAll('.add-tab').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('tabManual').style.display=tab==='manual'?'block':'none';
+  document.getElementById('tabPhoto').style.display=tab==='photo'?'block':'none';
+  document.getElementById('tabPdf').style.display=tab==='pdf'?'block':'none';
+}
+
+function addWordManual(){
+  const nl=document.getElementById('newNl').value.trim();
+  const fa=document.getElementById('newFa').value.trim();
+  const tr=document.getElementById('newTranslit').value.trim();
+  if(!nl||!fa) return;
+  const listId=document.getElementById('targetListSelect').value;
+  pushWordToList(listId,{nl,fa,translit:tr});
+  document.getElementById('newNl').value=''; document.getElementById('newFa').value=''; document.getElementById('newTranslit').value='';
+  showToast(`✓ Toegevoegd aan "${lists.find(l=>l.id===listId)?.name}"`);
+}
+
+function pushWordToList(listId, w){
+  const lst=lists.find(l=>l.id===listId); if(!lst) return;
+  lst.words.push(w); saveData();
+}
+
+let previewWords=[];
+function handlePhoto(ev){
+  const file=ev.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{ document.getElementById('photoPreview').src=e.target.result; document.getElementById('photoPreview').style.display='block'; analyzeImage(e.target.result); };
+  reader.readAsDataURL(file);
+}
+
+async function analyzeImage(dataUrl){
+  const status=document.getElementById('aiStatus');
+  document.getElementById('previewSection').style.display='none';
+  status.className='ai-status loading'; status.textContent='🔍 AI herkent woorden uit de foto...';
+  const base64=dataUrl.split(',')[1]; const mime=dataUrl.split(';')[0].split(':')[1];
+  try{
+    const resp=await apiFetch({model:"claude-sonnet-4-20250514",max_tokens:1000,messages:[{role:"user",content:[
+        {type:"image",source:{type:"base64",media_type:mime,data:base64}},
+        {type:"text",text:"Je bent een Perzisch taalhulp. Extraheer alle Perzisch-Nederlands woordparen. Geef ALLEEN geldig JSON:\n[{\"nl\":\"...\",\"fa\":\"... met diacrieten\",\"translit\":\"... met â û î\"}]\nAls er geen woorden zijn: []."}
+      ]}]});
+    const data=await resp.json();
+    const parsed=JSON.parse(data.content.map(i=>i.text||'').join('').replace(/```json|```/g,'').trim());
+    if(!Array.isArray(parsed)||!parsed.length){status.className='ai-status error';status.textContent='⚠️ Geen woorden herkend.';return;}
+    previewWords=parsed; renderPreview(parsed);
+    status.className='ai-status success'; status.textContent=`✓ ${parsed.length} woord${parsed.length!==1?'en':''} herkend!`;
+    document.getElementById('previewSection').style.display='block';
+  }catch(e){status.className='ai-status error';status.textContent='⚠️ Er ging iets mis.';console.error(e);}
+}
+
+function esc(s){return(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
+
+function renderPreview(list){
+  document.getElementById('previewBody').innerHTML=list.map((w,i)=>`<tr>
+    <td><input value="${esc(w.nl)}" onchange="previewWords[${i}].nl=this.value"/></td>
+    <td><input class="fa-inp" value="${esc(w.fa)}" onchange="previewWords[${i}].fa=this.value"/></td>
+    <td><input value="${esc(w.translit||'')}" onchange="previewWords[${i}].translit=this.value"/></td>
+    <td><button class="del-btn" onclick="removePreview(${i})">✕</button></td>
+  </tr>`).join('');
+}
+
+function removePreview(i){ previewWords.splice(i,1); renderPreview(previewWords); if(!previewWords.length) document.getElementById('previewSection').style.display='none'; }
+
+function addPreviewWords(){
+  const listId=document.getElementById('targetListSelect').value;
+  previewWords.forEach(w=>pushWordToList(listId,{nl:w.nl,fa:w.fa,translit:w.translit||''}));
+  const name=lists.find(l=>l.id===listId)?.name;
+  previewWords=[]; document.getElementById('previewSection').style.display='none';
+  document.getElementById('aiStatus').textContent=''; document.getElementById('aiStatus').className='ai-status';
+  document.getElementById('photoPreview').style.display='none';
+  document.querySelector('#tabPhoto input[type=file]').value='';
+  showToast(`✓ Woorden toegevoegd aan "${name}"`);
+}
+
+function confirmReset(){
+  // Toon inline bevestiging
+  const btn=document.querySelector('.reset-btn:last-child');
+  const existing=document.getElementById('resetConfirm');
+  if(existing){existing.remove();return;}
+  const div=document.createElement('div');
+  div.id='resetConfirm';
+  div.style.cssText='margin-top:10px;display:flex;gap:8px;align-items:center;';
+  div.innerHTML=`<span style="font-size:0.78rem;color:var(--red);flex:1">Voortgang wissen?</span>
+    <button onclick="doReset()" style="padding:6px 12px;border-radius:8px;border:none;background:#dc2626;color:#fff;font-family:'Nunito',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer">Ja</button>
+    <button onclick="document.getElementById('resetConfirm').remove()" style="padding:6px 12px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--muted);font-family:'Nunito',sans-serif;font-weight:700;font-size:0.8rem;cursor:pointer">Nee</button>`;
+  btn.parentNode.insertBefore(div, btn.nextSibling);
+}
+function doReset(){ srsData={}; saveData(); document.getElementById('resetConfirm')?.remove(); showToast('✓ Voortgang gewist.'); }
+
+function syncLists(){
+  // Voeg lijsten uit de code toe als ze nog niet bestaan (op basis van id)
+  const defaults=[DEFAULT_LIST, DEFAULT_LIST2, DEFAULT_LIST3];
+  let added=0, updated=0;
+  defaults.forEach(def=>{
+    const existing=lists.find(l=>l.id===def.id);
+    if(!existing){
+      lists.push({...def});
+      added++;
+    } else {
+      // Voeg nieuwe woorden toe die nog niet in de lijst staan
+      def.words.forEach(w=>{
+        const exists=existing.words.some(ew=>ew.fa===w.fa&&ew.nl===w.nl);
+        if(!exists){ existing.words.push(w); updated++; }
+      });
+    }
+  });
+  saveData();
+  renderListCards();
+  if(added>0||updated>0){
+    showToast(`✓ Gesynchroniseerd!\n${added} nieuwe lijst${added!==1?'en':''} toegevoegd, ${updated} woord${updated!==1?'en':''} toegevoegd`);
+  } else {
+    showToast('✓ Alles is al up-to-date!');
+  }
+}
+
+
+// ===== PDF + AI =====
+let pdfPreviewWords=[];
+
+function handlePdf(ev){
+  const file=ev.target.files[0]; if(!file) return;
+  const status=document.getElementById('pdfStatus');
+  document.getElementById('pdfPreviewSection').style.display='none';
+  status.className='ai-status loading';
+  status.textContent='📄 PDF wordt ingelezen...';
+  const reader=new FileReader();
+  reader.onload=async e=>{
+    try{
+      const pdfData=new Uint8Array(e.target.result);
+      if(!window.pdfjsLib){
+        await loadScript('https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js');
+        pdfjsLib.GlobalWorkerOptions.workerSrc='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+      }
+      status.textContent='📄 Paginas renderen...';
+      const pdf=await pdfjsLib.getDocument({data:pdfData}).promise;
+      const images=[];
+      for(let p=1;p<=Math.min(pdf.numPages,8);p++){
+        const page=await pdf.getPage(p);
+        const viewport=page.getViewport({scale:2});
+        const canvas=document.createElement('canvas');
+        canvas.width=viewport.width; canvas.height=viewport.height;
+        await page.render({canvasContext:canvas.getContext('2d'),viewport}).promise;
+        images.push(canvas.toDataURL('image/jpeg',0.82).split(',')[1]);
+      }
+      status.textContent=`🔍 AI analyseert ${images.length} pagina(s)...`;
+      await analyzePdfImages(images);
+    }catch(err){
+      status.className='ai-status error';
+      status.textContent='⚠️ Fout bij lezen PDF: '+err.message;
+    }
+  };
+  reader.readAsArrayBuffer(file);
+}
+
+function loadScript(src){
+  return new Promise((res,rej)=>{
+    if(document.querySelector(`script[src="${src}"]`)){res();return;}
+    const s=document.createElement('script');
+    s.src=src; s.onload=res; s.onerror=rej;
+    document.head.appendChild(s);
+  });
+}
+
+async function analyzePdfImages(images){
+  const status=document.getElementById('pdfStatus');
+  try{
+    const msgContent=[
+      ...images.map(b64=>({type:"image",source:{type:"base64",media_type:"image/jpeg",data:b64}})),
+      {type:"text",text:"Je bent een Perzisch taalhulp. Bekijk deze pagina's en extraheer ALLE Perzisch-Nederlands woordparen. Geef ALLEEN geldig JSON, geen uitleg:\n[{\"nl\":\"Nederlandse betekenis\",\"fa\":\"فارسی met diacrieten\",\"translit\":\"uitspraak met â û î\"}]\nAls er niets is: []"}
+    ];
+    const resp=await apiFetch({model:"claude-sonnet-4-20250514",max_tokens:2000,messages:[{role:"user",content:msgContent}]});
+    const data=await resp.json();
+    if(data.error){status.className='ai-status error';status.textContent='⚠️ '+data.error.message;return;}
+    const text=data.content.filter(i=>i.type==='text').map(i=>i.text).join('');
+    const parsed=JSON.parse(text.replace(/```json|```/g,'').trim());
+    if(!Array.isArray(parsed)||!parsed.length){
+      status.className='ai-status error';status.textContent='⚠️ Geen woordparen gevonden.';return;
+    }
+    pdfPreviewWords=parsed;renderPdfPreview(parsed);
+    status.className='ai-status success';
+    status.textContent=`✓ ${parsed.length} woord${parsed.length!==1?'en':''} gevonden!`;
+    document.getElementById('pdfPreviewSection').style.display='block';
+  }catch(e){
+    status.className='ai-status error';status.textContent='⚠️ Fout: '+e.message;
+  }
+}
+
+function renderPdfPreview(list){
+  document.getElementById('pdfPreviewBody').innerHTML=list.map((w,i)=>`<tr>
+    <td><input value="${esc(w.nl)}" onchange="pdfPreviewWords[${i}].nl=this.value"/></td>
+    <td><input class="fa-inp" value="${esc(w.fa)}" onchange="pdfPreviewWords[${i}].fa=this.value"/></td>
+    <td><input value="${esc(w.translit||'')}" onchange="pdfPreviewWords[${i}].translit=this.value"/></td>
+    <td><button class="del-btn" onclick="removePdfPreview(${i})">✕</button></td>
+  </tr>`).join('');
+}
+
+function removePdfPreview(i){
+  pdfPreviewWords.splice(i,1);renderPdfPreview(pdfPreviewWords);
+  if(!pdfPreviewWords.length) document.getElementById('pdfPreviewSection').style.display='none';
+}
+
+function addPdfPreviewWords(){
+  const listId=document.getElementById('targetListSelect').value;
+  pdfPreviewWords.forEach(w=>pushWordToList(listId,{nl:w.nl,fa:w.fa,translit:w.translit||''}));
+  const name=lists.find(l=>l.id===listId)?.name;
+  pdfPreviewWords=[];
+  document.getElementById('pdfPreviewSection').style.display='none';
+  document.getElementById('pdfStatus').textContent='';
+  document.getElementById('pdfStatus').className='ai-status';
+  document.querySelector('#tabPdf input[type=file]').value='';
+  showToast(`✓ Woorden toegevoegd aan "${name}"`);
+}
+
+
+// ===== API SLEUTEL =====
+function getApiKey(){
+  return localStorage.getItem('anthropic_api_key')||'';
+}
+function saveApiKey(){
+  const key=document.getElementById('apiKeyInput').value.trim();
+  if(!key.startsWith('sk-')){showToast('⚠️ Ongeldige sleutel — begint met sk-ant-...');return;}
+  localStorage.setItem('anthropic_api_key',key);
+  document.getElementById('apiKeyBanner').style.display='none';
+  showToast('✓ API-sleutel opgeslagen!');
+}
+function checkApiKey(){
+  // In Claude-omgeving: geen sleutel nodig
+  const inClaude = window.self !== window.top || 
+                   document.referrer.includes('anthropic') || 
+                   document.referrer.includes('claude');
+  if(!inClaude && !getApiKey()){
+    document.getElementById('apiKeyBanner').style.display='block';
+  }
+}
+function apiFetch(bodyObj){
+  const key=getApiKey();
+  const headers={'Content-Type':'application/json'};
+  if(key) headers['x-api-key']=key;
+  return fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST', headers, body:JSON.stringify(bodyObj)
+  });
+}
+
+// ===== START =====
+loadData();
+checkApiKey();
+showScreen('lists');
+</script>
+</body>
+</html>
