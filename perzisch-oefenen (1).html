@@ -300,6 +300,18 @@ let mode = 'both';
 let sessionQueue = [], currentCard = null, showingAnswer = false;
 let totalGood = 0, totalBad = 0;
 
+const DEFAULT_LIST_TEST = {
+  id: 'test',
+  name: '🧪 Test (5 woorden)',
+  words: [
+    {nl:"Hond",    fa:"سَگ",    translit:"sag"},
+    {nl:"Kat",     fa:"گَربه",  translit:"garbe"},
+    {nl:"Water",   fa:"آب",     translit:"âb"},
+    {nl:"Brood",   fa:"نان",    translit:"nân"},
+    {nl:"School",  fa:"مَدرَسه", translit:"madrase"},
+  ]
+};
+
 const DEFAULT_LIST = {
   id: 'default',
   name: 'Les 1 & 2',
@@ -387,7 +399,7 @@ const DEFAULT_LIST3 = {
 
 // ===== OPSLAG =====
 function saveData(){
-  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({lists, srsData})); }
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify({lists, srsData, activeListIds})); }
   catch(e){ console.warn('Opslag mislukt',e); }
 }
 function loadData(){
@@ -395,9 +407,10 @@ function loadData(){
     const raw = localStorage.getItem(STORAGE_KEY);
     if(!raw){ lists=[{...DEFAULT_LIST}]; return; }
     const d = JSON.parse(raw);
-    lists = d.lists && d.lists.length ? d.lists : [{...DEFAULT_LIST},{...DEFAULT_LIST2},{...DEFAULT_LIST3}];
+    lists = d.lists && d.lists.length ? d.lists : [{...DEFAULT_LIST},{...DEFAULT_LIST2},{...DEFAULT_LIST3},{...DEFAULT_LIST_TEST}];
     srsData = d.srsData || {};
-  } catch(e){ lists=[{...DEFAULT_LIST},{...DEFAULT_LIST2},{...DEFAULT_LIST3}]; }
+    if(d.activeListIds && d.activeListIds.length) activeListIds = d.activeListIds;
+  } catch(e){ lists=[{...DEFAULT_LIST},{...DEFAULT_LIST2},{...DEFAULT_LIST3},{...DEFAULT_LIST_TEST}]; }
 }
 
 // ===== SRS =====
@@ -545,6 +558,7 @@ function countDueForList(listId){
 
 function startWithLists(ids){
   activeListIds=ids;
+  saveData();
   const label=ids.includes('all')?'Alle lijsten':lists.find(l=>l.id===ids[0])?.name||'';
   document.getElementById('activeListLabel').textContent='📖 '+label;
   showScreen('quiz');
@@ -878,7 +892,7 @@ function doReset(){ srsData={}; saveData(); document.getElementById('resetConfir
 
 function syncLists(){
   // Voeg lijsten uit de code toe als ze nog niet bestaan (op basis van id)
-  const defaults=[DEFAULT_LIST, DEFAULT_LIST2, DEFAULT_LIST3];
+  const defaults=[DEFAULT_LIST, DEFAULT_LIST2, DEFAULT_LIST3, DEFAULT_LIST_TEST];
   let added=0, updated=0;
   defaults.forEach(def=>{
     const existing=lists.find(l=>l.id===def.id);
